@@ -8,7 +8,15 @@ $config = new \SampApi\Config([
 ]);
 $client = new \SampApi\Rcon($config);
 
-// Get list of vars
-$response = $client->send('varlist');
+// Get list of vars (only this method is ready for right now)
+$response = $client->getVarlist();
+dump($response);
 
-dd($response);
+// Another way
+$response = $client->send('varlist');
+dump($response);
+
+// Yet another way, OOP style
+$client->responseModel = true;
+$response = $client->getVarlist();
+dump($response);

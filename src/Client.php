@@ -41,15 +41,15 @@ abstract class Client implements ClientInterface
      */
     public function connect(): bool
     {
-        $connected    = false;
-        $string       = $this->encodeControl('p0101');
-        $this->socket = fsockopen('udp://' . $this->config->ip, $this->config->port, $errorNum, $errorString, 2);
+        $this->socket = stream_socket_client('udp://' . $this->config->ip . ':' . $this->config->port, $errorcode, $errormsg);
         stream_set_timeout($this->socket, 2);
+        $string = $this->packetBackbone('p0101');
         fwrite($this->socket, $string);
         if (fread($this->socket, 10) && fread($this->socket, 5) === 'p0101') {
-            $connected = true;
+            return true;
         }
-        return $connected;
+        $this->socket = null;
+        throw new \RuntimeException("Unable to connect to remote server \"udp://{$this->config->ip}:{$this->config->port}\"");
     }
 
     /**
@@ -62,7 +62,7 @@ abstract class Client implements ClientInterface
      */
     public function send(string $command, float $delay = 1.0): array
     {
-        $string = $this->encodeCommand($command);
+        $string = $this->packetRcon($command);
         fwrite($this->socket, $string);
 
         $result    = [];
@@ -84,11 +84,12 @@ abstract class Client implements ClientInterface
      * @param string $command
      *
      * @return string
+     * @link https://wiki.sa-mp.com/wiki/Query_Mechanism#RCON_Packets
      */
-    public function encodeCommand(string $command): string
+    public function packetRcon(string $command): string
     {
         return
-            $this->encodeControl('x')
+            $this->packetBackbone('x')
             . chr(strlen($this->config->password) & 0xFF)
             . chr(strlen($this->config->password) >> 8 & 0xFF)
             . $this->config->password
@@ -103,15 +104,18 @@ abstract class Client implements ClientInterface
      * @param string $state
      *
      * @return string
+     * @link https://wiki.sa-mp.com/wiki/Query_Mechanism#The_backbone_of_packets
      */
-    public function encodeControl(string $state): string
+    public function packetBackbone(string $state): string
     {
+        $ip = explode('.', $this->config->ip);
+
         return
             'SAMP'
-            . chr(strtok($this->config->ip, '.'))
-            . chr(strtok('.'))
-            . chr(strtok('.'))
-            . chr(strtok('.'))
+            . chr($ip[0])
+            . chr($ip[1])
+            . chr($ip[2])
+            . chr($ip[3])
             . chr($this->config->port & 0xFF)
             . chr($this->config->port >> 8 & 0xFF)
             . $state;

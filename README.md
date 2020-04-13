@@ -16,12 +16,21 @@ $config = new \SampApi\Config([
     'port'     => '7777',
     'password' => '12345',
 ]);
-$rcon = new \SampApi\Rcon($config);
+$client = new \SampApi\Rcon($config);
 
-// Get list of vars
-$response = $rcon->send('varlist');
+// Get list of vars (only this method is ready for right now)
+$response = $client->getVarlist();
+dump($response);
 
-dd($response);
+// Another way
+$response = $client->send('varlist');
+dump($response);
+
+// Yet another way, OOP style
+$client->responseModel = true;
+$response = $client->getVarlist();
+dump($response);
+
 ```
 
 List of all available commands can be found [here](https://wiki.sa-mp.com/wiki/RCON#RCON_Commands).

@@ -33,7 +33,7 @@ interface ClientInterface
      *
      * @return string
      */
-    public function encodeCommand(string $command): string;
+    public function packetRcon(string $command): string;
 
     /**
      * Assembles a control packet
@@ -42,6 +42,6 @@ interface ClientInterface
      *
      * @return string
      */
-    public function encodeControl(string $state): string;
+    public function packetBackbone(string $state): string;
 
 }
