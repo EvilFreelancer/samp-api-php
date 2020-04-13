@@ -1,0 +1,22 @@
+{
+  "type": "library",
+  "name": "evilfreelancer/samp-api-php",
+  "description": "GTA San Andreas Multiplayer PHP client for work with remote console",
+  "keywords": [
+    "samp",
+    "socket-client"
+  ],
+  "license": "MIT",
+  "autoload": {
+    "psr-4": {
+      "SampApi\\": "./src"
+    }
+  },
+  "require": {
+    "ext-json": "*"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^9.1",
+    "larapack/dd": "^1.1"
+  }
+}
